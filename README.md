@@ -10,6 +10,7 @@ The module contains the following packages:
 
 <a name="links"></a> Quick links:
 
+*[ODBC Driver for SQL Server](https://docs.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver15)
 * [Configuration](https://www.pipservices.org/recipies/configuration)
 * [API Reference](https://pip-services3-python.github.io/pip-services3-sqlserver-python/)
 * [Change Log](CHANGELOG.md)
