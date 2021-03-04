@@ -1,0 +1,7 @@
+pip\_services3\_sqlserver.persistence.SqlServerPersistence module
+=================================================================
+
+.. automodule:: pip_services3_sqlserver.persistence.SqlServerPersistence
+   :members:
+   :undoc-members:
+   :show-inheritance:

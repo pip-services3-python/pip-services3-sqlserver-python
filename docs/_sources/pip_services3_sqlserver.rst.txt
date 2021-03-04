@@ -1,0 +1,20 @@
+pip\_services3\_sqlserver package
+=================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pip_services3_sqlserver.build
+   pip_services3_sqlserver.connect
+   pip_services3_sqlserver.persistence
+
+Module contents
+---------------
+
+.. automodule:: pip_services3_sqlserver
+   :members:
+   :undoc-members:
+   :show-inheritance:

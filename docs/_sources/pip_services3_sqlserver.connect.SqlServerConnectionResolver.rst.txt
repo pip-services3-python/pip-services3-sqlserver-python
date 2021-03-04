@@ -1,0 +1,7 @@
+pip\_services3\_sqlserver.connect.SqlServerConnectionResolver module
+====================================================================
+
+.. automodule:: pip_services3_sqlserver.connect.SqlServerConnectionResolver
+   :members:
+   :undoc-members:
+   :show-inheritance:

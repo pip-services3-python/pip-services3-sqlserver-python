@@ -1,0 +1,7 @@
+pip\_services3\_sqlserver.persistence.IdentifiableJsonSqlServerPersistence module
+=================================================================================
+
+.. automodule:: pip_services3_sqlserver.persistence.IdentifiableJsonSqlServerPersistence
+   :members:
+   :undoc-members:
+   :show-inheritance:

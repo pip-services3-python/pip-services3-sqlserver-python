@@ -1,0 +1,18 @@
+pip\_services3\_sqlserver.connect package
+=========================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pip_services3_sqlserver.connect.SqlServerConnectionResolver
+
+Module contents
+---------------
+
+.. automodule:: pip_services3_sqlserver.connect
+   :members:
+   :undoc-members:
+   :show-inheritance:

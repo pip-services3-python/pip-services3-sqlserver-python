@@ -1,0 +1,7 @@
+pip\_services3\_sqlserver.build.DefaultSqlServerFactory module
+==============================================================
+
+.. automodule:: pip_services3_sqlserver.build.DefaultSqlServerFactory
+   :members:
+   :undoc-members:
+   :show-inheritance:
