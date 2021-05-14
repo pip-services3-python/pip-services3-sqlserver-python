@@ -18,12 +18,12 @@ try:
 except:
     readme = __doc__
 
-from setuptools import setup
 from setuptools import find_packages
+from setuptools import setup
 
 setup(
     name='pip_services3_sqlserver',
-    version='3.0.0',
+    version='3.0.1',
     url='http://github.com/pip-services3-python/pip-services3-sqlserver-python',
     license='MIT',
     author='Conceptual Vision Consulting LLC',
@@ -36,8 +36,8 @@ setup(
     zip_safe=True,
     platforms='any',
     install_requires=[
-        'iso8601', 
-        'PyYAML', 
+        'iso8601',
+        'PyYAML',
         'pyodbc',
         'pip_services3_commons',
         'pip_services3_components',
@@ -52,5 +52,5 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries :: Python Modules'
-    ]    
+    ]
 )

@@ -3,7 +3,7 @@ import os
 
 from pip_services3_commons.config import ConfigParams
 
-from pip_services3_sqlserver.persistence.SqlServerConnection import SqlServerConnection
+from pip_services3_sqlserver.connect.SqlServerConnection import SqlServerConnection
 
 
 class TestSqlServerConnection:

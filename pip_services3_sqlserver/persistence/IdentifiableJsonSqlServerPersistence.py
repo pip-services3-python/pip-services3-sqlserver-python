@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import json
+from typing import Any, Optional
 
-from pip_services3_commons.data import IIdentifiable
+from pip_services3_commons.data import AnyValueMap
 
 from pip_services3_sqlserver.persistence.IdentifiableSqlServerPersistence import IdentifiableSqlServerPersistence
 
 
-class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence, IIdentifiable):
+class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence):
     """
     Abstract persistence component that stores data in SqlServer in JSON or JSONB fields
     and implements a number of CRUD operations over data items with unique ids.
@@ -77,13 +78,15 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence, IId
         # ...
     """
 
-    def __init__(self, table_name):
+    def __init__(self, table_name: str = None):
         """
         Creates a new instance of the persistence component.
+
+        :param table_name: (optional) a collection name.
         """
         super(IdentifiableJsonSqlServerPersistence, self).__init__(table_name)
 
-    def _ensure_table(self, id_type='VARCHAR(32)', data_type='NVARCHAR(MAX)'):
+    def _ensure_table(self, id_type: str = 'VARCHAR(32)', data_type: str = 'NVARCHAR(MAX)'):
         """
         Adds DML statement to automatically create JSON(B) table
 
@@ -94,7 +97,7 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence, IId
             self._table_name) + " ([id] " + id_type + " PRIMARY KEY, [data] " + data_type + ")"
         self._auto_create_object(query)
 
-    def _convert_to_public(self, value):
+    def _convert_to_public(self, value: Any) -> Any:
         """
         Converts object value from internal to public format.
 
@@ -105,7 +108,7 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence, IId
             return None
         return json.loads(value.data)
 
-    def _convert_from_public(self, value):
+    def _convert_from_public(self, value: Any) -> Any:
         """
         Convert object value from public to internal format.
 
@@ -122,7 +125,7 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence, IId
 
         return result
 
-    def _convert_from_public_partial(self, value):
+    def _convert_from_public_partial(self, value: Any) -> Any:
         """
         Converts the given object from the public partial format.
 
@@ -131,7 +134,7 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence, IId
         """
         return dict(value)
 
-    def update_partially(self, correlation_id, id, data):
+    def update_partially(self, correlation_id: Optional[str], id: Any, data: AnyValueMap) -> Optional[dict]:
         """
         Updates only few selected fields in a data item.
 

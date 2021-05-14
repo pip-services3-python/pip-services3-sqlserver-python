@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import urllib.parse as urlparse
+from typing import Optional, Any
 
 import pyodbc
 from pip_services3_commons.config import IConfigurable, ConfigParams
 from pip_services3_commons.errors import ConnectionException
-from pip_services3_commons.refer import IReferenceable
+from pip_services3_commons.refer import IReferenceable, IReferences
 from pip_services3_commons.run import IOpenable
 from pip_services3_components.log import CompositeLogger
 
@@ -39,29 +40,33 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
         - `*:discovery:*:*:1.0`        (optional) :class:`IDiscovery <pip_services3_components.connect.IDiscovery.IDiscovery>` services
         - `*:credential-store:*:*:1.0` (optional) :class:`ICredentialStore <pip_services3_components.auth.ICredentialStore.ICredentialStore>` stores to resolve credentials
     """
-    __default_config = ConfigParams.from_tuples(
-        # connections. *
-        # credential. *
-
-        "options.connect_timeout", 15000,
-        "options.request_timeout", 15000,
-        "options.idle_timeout", 30000,
-        "options.max_pool_size", 3
-    )
 
     def __init__(self):
-        # The logger.
-        self._logger = CompositeLogger()
-        # The connection resolver.
-        self._connection_resolver = SqlServerConnectionResolver()
-        # The configuration options.
-        self._options = ConfigParams()
-        # The SQLServer connection pool object.
-        self._connection = None
-        # The SQLServer database name.
-        self._database_name = None
+        """
+        Creates a new instance of the connection component.
+        """
+        self.__default_config = ConfigParams.from_tuples(
+            # connections. *
+            # credential. *
 
-    def configure(self, config):
+            "options.connect_timeout", 15000,
+            "options.request_timeout", 15000,
+            "options.idle_timeout", 30000,
+            "options.max_pool_size", 3
+        )
+
+        # The logger.
+        self._logger: CompositeLogger = CompositeLogger()
+        # The connection resolver.
+        self._connection_resolver: SqlServerConnectionResolver = SqlServerConnectionResolver()
+        # The configuration options.
+        self._options: ConfigParams = ConfigParams()
+        # The SQLServer connection pool object.
+        self._connection: Any = None
+        # The SQLServer database name.
+        self._database_name: str = None
+
+    def configure(self, config: ConfigParams):
         """
         Configures component by passing configuration parameters.
 
@@ -73,7 +78,7 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
 
         self._options = self._options.override(config.get_section('options'))
 
-    def set_references(self, references):
+    def set_references(self, references: IReferences):
         """
         Sets references to dependent components.
 
@@ -82,7 +87,7 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
         self._logger.set_references(references)
         self._connection_resolver.set_references(references)
 
-    def is_opened(self):
+    def is_open(self) -> bool:
         """
         Checks if the component is opened.
 
@@ -90,7 +95,7 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
         """
         return self._connection is not None
 
-    def __compose_uri_settings(self, uri):
+    def __compose_uri_settings(self, uri: str) -> str:
         max_pool_size = self._options.get_as_nullable_string("max_pool_size")
         connect_timeout_MS = self._options.get_as_nullable_integer("connect_timeout")
         request_timeout_MS = self._options.get_as_nullable_integer("request_timeout")
@@ -123,7 +128,7 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
 
         return uri
 
-    def open(self, correlation_id):
+    def open(self, correlation_id: Optional[str]):
         """
         Opens the component.
 
@@ -157,7 +162,7 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
         except Exception as err:
             self._logger.error(correlation_id, err, 'Failed to resolve sqlserver connection')
 
-    def close(self, correlation_id):
+    def close(self, correlation_id: Optional[str]):
         """
         Closes component and frees used resources.
 
@@ -178,8 +183,16 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
         self._connection = None
         self._database_name = None
 
-    def get_connection(self):
+    def get_connection(self) -> Any:
+        """
+        TODO add description
+        :return:
+        """
         return self._connection
 
-    def get_database_name(self):
+    def get_database_name(self) -> str:
+        """
+        TODO add description
+        :return:
+        """
         return self._database_name

@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from copy import deepcopy
-from typing import List
+from typing import List, Optional, Any
 
 from pip_services3_commons.config import IConfigurable, ConfigParams
 from pip_services3_commons.errors import ConfigException
-from pip_services3_commons.refer import IReferenceable
-from pip_services3_components.auth import CredentialResolver
+from pip_services3_commons.refer import IReferenceable, IReferences
+from pip_services3_commons.run import IOpenable
+from pip_services3_components.auth import CredentialResolver, CredentialParams
 from pip_services3_components.connect import ConnectionResolver, ConnectionParams
 
 
-class SqlServerConnectionResolver(IReferenceable, IConfigurable):
+class SqlServerConnectionResolver(IReferenceable, IConfigurable, IOpenable):
     """
     Helper class that resolves SqlServer connection and credential parameters,
     validates them and generates a connection URI.
@@ -36,11 +36,11 @@ class SqlServerConnectionResolver(IReferenceable, IConfigurable):
 
     def __init__(self):
         # The connections resolver.
-        self._connection_resolver = ConnectionResolver()
+        self._connection_resolver: ConnectionResolver = ConnectionResolver()
         # The credentials resolver.
-        self._credential_resolver = CredentialResolver()
+        self._credential_resolver: CredentialResolver = CredentialResolver()
 
-    def configure(self, config):
+    def configure(self, config: ConfigParams):
         """
         Configures component by passing configuration parameters.
 
@@ -49,7 +49,7 @@ class SqlServerConnectionResolver(IReferenceable, IConfigurable):
         self._connection_resolver.configure(config)
         self._credential_resolver.configure(config)
 
-    def set_references(self, references):
+    def set_references(self, references: IReferences):
         """
         Sets references to dependent components.
 
@@ -58,7 +58,7 @@ class SqlServerConnectionResolver(IReferenceable, IConfigurable):
         self._connection_resolver.set_references(references)
         self._connection_resolver.set_references(references)
 
-    def __validate_connection(self, correlation_id, connection: ConnectionParams):
+    def __validate_connection(self, correlation_id: Optional[str], connection: ConnectionParams) -> Any:
         uri = connection.get_uri()
         if uri is not None:
             return None
@@ -77,7 +77,7 @@ class SqlServerConnectionResolver(IReferenceable, IConfigurable):
 
         return None
 
-    def __validate_connections(self, correlation_id, connections: List[ConnectionParams]):
+    def __validate_connections(self, correlation_id: Optional[str], connections: List[ConnectionParams]) -> Any:
         if connections is None or len(connections) == 0:
             raise ConfigException(correlation_id, "NO_CONNECTION", "Database connection is not set")
 
@@ -86,7 +86,7 @@ class SqlServerConnectionResolver(IReferenceable, IConfigurable):
 
         return None
 
-    def __compose_uri(self, connections: List[ConnectionParams], credential):
+    def __compose_uri(self, connections: List[ConnectionParams], credential: CredentialParams) -> str:
         # If there is a uri then return it immediately
         for connection in connections:
             uri = connection.get_uri()
@@ -132,7 +132,7 @@ class SqlServerConnectionResolver(IReferenceable, IConfigurable):
         options.remove('password')
 
         params = ''
-        keys = options.get_key_names()
+        keys = options.get_keys()
         for key in keys:
             if len(params) > 0:
                 params += '&'
@@ -151,7 +151,7 @@ class SqlServerConnectionResolver(IReferenceable, IConfigurable):
 
         return uri
 
-    def resolve(self, correlation_id):
+    def resolve(self, correlation_id: Optional[str]) -> str:
         """
         Resolves SQLServer config from connection and credential parameters.
 

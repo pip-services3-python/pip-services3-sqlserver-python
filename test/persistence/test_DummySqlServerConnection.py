@@ -4,7 +4,7 @@ import os
 from pip_services3_commons.config import ConfigParams
 from pip_services3_commons.refer import References, Descriptor
 
-from pip_services3_sqlserver.persistence.SqlServerConnection import SqlServerConnection
+from pip_services3_sqlserver.connect.SqlServerConnection import SqlServerConnection
 from test.fixtures.DummyPersistenceFixture import DummyPersistenceFixture
 from test.persistence.DummySqlServerPersistence import DummySqlServerPersistence
 

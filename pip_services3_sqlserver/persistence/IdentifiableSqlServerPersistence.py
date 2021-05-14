@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
+from typing import Any, Optional, List
 
 import pyodbc
-from pip_services3_commons.data import IIdentifiable, IdGenerator
+from pip_services3_commons.data import IdGenerator, AnyValueMap
 
 from pip_services3_sqlserver.persistence.SqlServerPersistence import SqlServerPersistence
 
 
-class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
+class IdentifiableSqlServerPersistence(SqlServerPersistence):
     """
     Abstract persistence component that stores data in SqlServer
     and implements a number of CRUD operations over data items with unique ids.
@@ -75,8 +76,8 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
         persistence.delete_by_id("123", "1")
         # ...
     """
-    
-    def __init__(self, table_name):
+
+    def __init__(self, table_name: str = None):
         """
         Creates a new instance of the persistence component.
 
@@ -86,7 +87,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
         if table_name is None:
             Exception("Table name could not be null")
 
-    def _convert_from_public_partial(self, value):
+    def _convert_from_public_partial(self, value: Any) -> Any:
         """
         Converts the given object from the public partial format.
 
@@ -95,7 +96,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
         """
         return self._convert_from_public(value)
 
-    def get_list_by_ids(self, correlation_id, ids):
+    def get_list_by_ids(self, correlation_id: Optional[str], ids: List[Any]) -> List[dict]:
         """
         Gets a list of data items retrieved by given unique ids.
 
@@ -114,7 +115,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
 
         return items
 
-    def get_one_by_id(self, correlation_id, id):
+    def get_one_by_id(self, correlation_id: Optional[str], id: Any) -> dict:
         """
         Gets a data item by its unique id.
 
@@ -137,7 +138,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
 
         return item
 
-    def create(self, correlation_id, item):
+    def create(self, correlation_id: Optional[str], item: Any) -> Optional[dict]:
         """
         Creates a data item.
 
@@ -156,7 +157,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
 
         return super().create(correlation_id, new_item)
 
-    def set(self, correlation_id, item):
+    def set(self, correlation_id: Optional[str], item: Any) -> Optional[dict]:
         """
         Sets a data item. If the data item exists it updates it,
         otherwise it create a new data item.
@@ -211,7 +212,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
 
         return new_item
 
-    def update(self, correlation_id, item):
+    def update(self, correlation_id: Optional[str], item: Any) -> Optional[dict]:
         """
         Updates a data item.
 
@@ -219,7 +220,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
         :param item: an item to be updated.
         :return: updated item
         """
-        if item is None and item.get('id') is None:
+        if item is None:
             return
 
         row = self._convert_from_public(item)
@@ -239,7 +240,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
 
         return new_item
 
-    def update_partially(self, correlation_id, id, data):
+    def update_partially(self, correlation_id: Optional[str], id: Any, data: AnyValueMap) -> Optional[dict]:
         """
         Updates only few selected fields in a data item.
 
@@ -268,7 +269,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
 
         return new_item
 
-    def delete_by_id(self, correlation_id, id):
+    def delete_by_id(self, correlation_id: Optional[str], id: Any) -> dict:
         """
         Deleted a data item by it's unique id.
 
@@ -286,7 +287,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
 
         return new_item
 
-    def delete_by_ids(self, correlation_id, ids):
+    def delete_by_ids(self, correlation_id: Optional[str], ids: List[Any]):
         """
         Deletes multiple data items by their unique ids.
 
@@ -300,5 +301,3 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence, IIdentifiable):
         count = self._request(query, ids)
 
         self._logger.trace(correlation_id, "Deleted %d items from %s", count, self._table_name)
-
-        return
