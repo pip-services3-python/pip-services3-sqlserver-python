@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from random import randint
-from typing import Any, Optional, List
+from typing import Any, Optional, List, TypeVar
 
 import pyodbc
 from pip_services3_commons.config import IConfigurable, ConfigParams
@@ -8,10 +8,13 @@ from pip_services3_commons.convert import LongConverter
 from pip_services3_commons.data import PagingParams, DataPage
 from pip_services3_commons.errors import ConnectionException, InvalidStateException
 from pip_services3_commons.refer import IReferenceable, IUnreferenceable, IReferences, DependencyResolver
+from pip_services3_commons.reflect import PropertyReflector
 from pip_services3_commons.run import IOpenable, ICleanable
 from pip_services3_components.log import CompositeLogger
 
 from pip_services3_sqlserver.connect.SqlServerConnection import SqlServerConnection
+
+T = TypeVar('T')  # Declare type variable
 
 
 class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpenable, ICleanable):
@@ -234,10 +237,14 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         """
         if not value:
             return
-        converted_val = {}
-        for i in range(len(value)):
-            converted_val[value.cursor_description[i][0]] = value[i]
-        return converted_val
+
+        if isinstance(value, pyodbc.Row):
+            converted_val = {}
+            for i in range(len(value)):
+                converted_val[value.cursor_description[i][0]] = value[i]
+            value = converted_val
+
+        return type('object', (object,), value)
 
     def _convert_from_public(self, value: Any) -> Any:
         """
@@ -246,7 +253,9 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         :param value: an object in public format to convert.
         :return: converted object in internal format.
         """
-        return dict(value)
+        if isinstance(value, dict):
+            return value
+        return PropertyReflector.get_properties(value)
 
     def _quote_identifier(self, value: str) -> str:
         if value is None or value == '':
@@ -533,7 +542,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
 
         return count
 
-    def get_list_by_filter(self, correlation_id: Optional[str], filter: Any, sort: Any, select: Any) -> List[Any]:
+    def get_list_by_filter(self, correlation_id: Optional[str], filter: Any, sort: Any, select: Any) -> List[T]:
         """
         Gets a list of data items retrieved by a given filter and sorted according to sort parameters.
         This method shall be called by a public getListByFilter method from child class that
@@ -564,7 +573,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
 
         return items
 
-    def get_one_random(self, correlation_id: Optional[str], filter: Any) -> dict:
+    def get_one_random(self, correlation_id: Optional[str], filter: Any) -> T:
         """
         Gets a random item from items that match to a given filter.
         This method shall be called by a public getOneRandom method from child class that
@@ -602,7 +611,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         item = self._convert_to_public(item)
         return item
 
-    def create(self, correlation_id: Optional[str], item: Any) -> Optional[dict]:
+    def create(self, correlation_id: Optional[str], item: T) -> Optional[T]:
         """
         Creates a data item.
 

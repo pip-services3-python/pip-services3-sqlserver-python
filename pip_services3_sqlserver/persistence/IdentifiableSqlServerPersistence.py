@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-from typing import Any, Optional, List
+from typing import Any, Optional, List, TypeVar
 
 import pyodbc
 from pip_services3_commons.data import IdGenerator, AnyValueMap
 
 from pip_services3_sqlserver.persistence.SqlServerPersistence import SqlServerPersistence
+
+T = TypeVar('T')  # Declare type variable
 
 
 class IdentifiableSqlServerPersistence(SqlServerPersistence):
@@ -96,7 +98,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
         """
         return self._convert_from_public(value)
 
-    def get_list_by_ids(self, correlation_id: Optional[str], ids: List[Any]) -> List[dict]:
+    def get_list_by_ids(self, correlation_id: Optional[str], ids: List[Any]) -> List[T]:
         """
         Gets a list of data items retrieved by given unique ids.
 
@@ -115,7 +117,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
 
         return items
 
-    def get_one_by_id(self, correlation_id: Optional[str], id: Any) -> dict:
+    def get_one_by_id(self, correlation_id: Optional[str], id: Any) -> T:
         """
         Gets a data item by its unique id.
 
@@ -138,7 +140,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
 
         return item
 
-    def create(self, correlation_id: Optional[str], item: Any) -> Optional[dict]:
+    def create(self, correlation_id: Optional[str], item: T) -> Optional[T]:
         """
         Creates a data item.
 
@@ -151,13 +153,13 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
 
         # Assign unique id
         new_item = item
-        if new_item.get('id') is None:
+        if new_item.id is None:
             new_item = deepcopy(new_item)
-            new_item['id'] = item['id'] or IdGenerator.next_long()
+            new_item.id = item.id or IdGenerator.next_long()
 
         return super().create(correlation_id, new_item)
 
-    def set(self, correlation_id: Optional[str], item: Any) -> Optional[dict]:
+    def set(self, correlation_id: Optional[str], item: T) -> Optional[T]:
         """
         Sets a data item. If the data item exists it updates it,
         otherwise it create a new data item.
@@ -212,7 +214,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
 
         return new_item
 
-    def update(self, correlation_id: Optional[str], item: Any) -> Optional[dict]:
+    def update(self, correlation_id: Optional[str], item: T) -> Optional[T]:
         """
         Updates a data item.
 
@@ -226,7 +228,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
         row = self._convert_from_public(item)
         params = self._generate_set_parameters(row)
         values = self._generate_values(row)
-        values.append(item['id'])
+        values.append(item.id)
 
         query = "UPDATE " + self._quote_identifier(
             self._table_name) + " SET " + params + f" OUTPUT INSERTED.* WHERE [id]=?"
@@ -234,13 +236,13 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
 
         result = self._request(query, values)
 
-        self._logger.trace(correlation_id, "Updated in %s with id = %s", self._table_name, item['id'])
+        self._logger.trace(correlation_id, "Updated in %s with id = %s", self._table_name, item.id)
 
         new_item = self._convert_to_public(result[0]) if result and result[0] and len(result) == 1 else None
 
         return new_item
 
-    def update_partially(self, correlation_id: Optional[str], id: Any, data: AnyValueMap) -> Optional[dict]:
+    def update_partially(self, correlation_id: Optional[str], id: Any, data: AnyValueMap) -> Optional[T]:
         """
         Updates only few selected fields in a data item.
 
@@ -269,7 +271,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
 
         return new_item
 
-    def delete_by_id(self, correlation_id: Optional[str], id: Any) -> dict:
+    def delete_by_id(self, correlation_id: Optional[str], id: Any) -> T:
         """
         Deleted a data item by it's unique id.
 

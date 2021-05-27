@@ -3,9 +3,8 @@
 from pip_services3_commons.data import IStringIdentifiable
 
 
-class Dummy(dict):
+class Dummy(IStringIdentifiable):
     def __init__(self, id=None, key=None, content=None):
-        super().__init__()
-        self['id'] = id
-        self['key'] = key
-        self['content'] = content
+        self.id = id
+        self.key = key
+        self.content = content

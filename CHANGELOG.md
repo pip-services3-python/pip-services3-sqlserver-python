@@ -2,6 +2,9 @@
 
 ## <a name="3.0.1"></a> 3.0.1 (2021-05-14)
 
+### Bug fixes
+* Fixed returned types for operations
+
 ### Features
 * Added type hints
 * Moved SqlServerConnection to **connect** package

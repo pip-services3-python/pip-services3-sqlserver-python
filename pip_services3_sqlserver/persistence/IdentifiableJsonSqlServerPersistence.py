@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import json
-from typing import Any, Optional
+from typing import Any, Optional, TypeVar
 
 from pip_services3_commons.data import AnyValueMap
 
 from pip_services3_sqlserver.persistence.IdentifiableSqlServerPersistence import IdentifiableSqlServerPersistence
+
+T = TypeVar('T')  # Declare type variable
 
 
 class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence):
@@ -106,7 +108,7 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence):
         """
         if value is None:
             return None
-        return json.loads(value.data)
+        return super()._convert_to_public(json.loads(value.data))
 
     def _convert_from_public(self, value: Any) -> Any:
         """
@@ -117,6 +119,8 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence):
         """
         if value is None:
             return None
+
+        value = super()._convert_from_public(value)
 
         result = {
             'id': value['id'],
@@ -134,7 +138,7 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence):
         """
         return dict(value)
 
-    def update_partially(self, correlation_id: Optional[str], id: Any, data: AnyValueMap) -> Optional[dict]:
+    def update_partially(self, correlation_id: Optional[str], id: Any, data: AnyValueMap) -> Optional[T]:
         """
         Updates only few selected fields in a data item.
 

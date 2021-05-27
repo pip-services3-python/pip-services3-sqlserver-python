@@ -7,6 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   pip_services3_sqlserver.connect.SqlServerConnection
    pip_services3_sqlserver.connect.SqlServerConnectionResolver
 
 Module contents

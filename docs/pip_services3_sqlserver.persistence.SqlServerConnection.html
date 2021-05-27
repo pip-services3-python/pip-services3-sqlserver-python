@@ -38,9 +38,7 @@
 
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="pip_services3_sqlserver.persistence.SqlServerPersistence module" href="pip_services3_sqlserver.persistence.SqlServerPersistence.html" />
-    <link rel="prev" title="pip_services3_sqlserver.persistence.IdentifiableSqlServerPersistence module" href="pip_services3_sqlserver.persistence.IdentifiableSqlServerPersistence.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -85,20 +83,8 @@
               
             
             
-              <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pip_services3_sqlserver</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="pip_services3_sqlserver.html">pip_services3_sqlserver package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="pip_services3_sqlserver.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="pip_services3_sqlserver.build.html">pip_services3_sqlserver.build package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pip_services3_sqlserver.connect.html">pip_services3_sqlserver.connect package</a></li>
-<li class="toctree-l4 current"><a class="reference internal" href="pip_services3_sqlserver.persistence.html">pip_services3_sqlserver.persistence package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="pip_services3_sqlserver.html#module-pip_services3_sqlserver">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">pip_services3_sqlserver</a></li>
 </ul>
 
             
@@ -147,12 +133,6 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="modules.html">pip_services3_sqlserver</a> &raquo;</li>
-        
-          <li><a href="pip_services3_sqlserver.html">pip_services3_sqlserver package</a> &raquo;</li>
-        
-          <li><a href="pip_services3_sqlserver.persistence.html">pip_services3_sqlserver.persistence package</a> &raquo;</li>
-        
       <li>pip_services3_sqlserver.persistence.SqlServerConnection module</li>
     
     
@@ -172,127 +152,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-pip_services3_sqlserver.persistence.SqlServerConnection">
-<span id="pip-services3-sqlserver-persistence-sqlserverconnection-module"></span><h1>pip_services3_sqlserver.persistence.SqlServerConnection module<a class="headerlink" href="#module-pip_services3_sqlserver.persistence.SqlServerConnection" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
-<dt id="pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection">
-<em class="property">class </em><code class="sig-prename descclassname">pip_services3_sqlserver.persistence.SqlServerConnection.</code><code class="sig-name descname">SqlServerConnection</code><a class="headerlink" href="#pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://pip-services3-python.github.io/pip-services3-commons-python/pip_services3_commons.refer.IReferenceable.html#pip_services3_commons.refer.IReferenceable.IReferenceable" title="(in pip-services3-commons)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pip_services3_commons.refer.IReferenceable.IReferenceable</span></code></a>, <a class="reference external" href="https://pip-services3-python.github.io/pip-services3-commons-python/pip_services3_commons.config.IConfigurable.html#pip_services3_commons.config.IConfigurable.IConfigurable" title="(in pip-services3-commons)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pip_services3_commons.config.IConfigurable.IConfigurable</span></code></a>, <a class="reference external" href="https://pip-services3-python.github.io/pip-services3-commons-python/pip_services3_commons.run.IOpenable.html#pip_services3_commons.run.IOpenable.IOpenable" title="(in pip-services3-commons)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pip_services3_commons.run.IOpenable.IOpenable</span></code></a></p>
-<p>SqlServer connection using plain driver.</p>
-<p>By defining a connection and sharing it through multiple persistence components
-you can reduce number of used database connections.</p>
-<dl class="simple">
-<dt>### Configuration parameters ###</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt>connection(s):</dt><dd><ul>
-<li><p>discovery_key:             (optional) a key to retrieve the connection from <a class="reference external" href="https://pip-services3-python.github.io/pip-services3-components-python/pip_services3_components.connect.IDiscovery.html#pip_services3_components.connect.IDiscovery.IDiscovery" title="(in pip-services3-components)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IDiscovery</span></code></a></p></li>
-<li><p>host:                      host name or IP address</p></li>
-<li><p>port:                      port number (default: 27017)</p></li>
-<li><p>uri:                       resource URI or connection string with all parameters in it</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>credential(s):</dt><dd><ul>
-<li><p>store_key:                 (optional) a key to retrieve the credentials from <a class="reference external" href="https://pip-services3-python.github.io/pip-services3-components-python/pip_services3_components.auth.ICredentialStore.html#pip_services3_components.auth.ICredentialStore.ICredentialStore" title="(in pip-services3-components)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ICredentialStore</span></code></a></p></li>
-<li><p>username:                  user name</p></li>
-<li><p>password:                  user password</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>options:</dt><dd><ul>
-<li><p>connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)</p></li>
-<li><p>idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)</p></li>
-<li><p>max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-<dt>### References ###</dt><dd><ul class="simple">
-<li><p><cite>*:logger:*:*:1.0</cite>           (optional) <a class="reference external" href="https://pip-services3-python.github.io/pip-services3-components-python/pip_services3_components.log.ILogger.html#pip_services3_components.log.ILogger.ILogger" title="(in pip-services3-components)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ILogger</span></code></a> components to pass log messages components to pass log messages</p></li>
-<li><p><cite>*:discovery:*:*:1.0</cite>        (optional) <a class="reference external" href="https://pip-services3-python.github.io/pip-services3-components-python/pip_services3_components.connect.IDiscovery.html#pip_services3_components.connect.IDiscovery.IDiscovery" title="(in pip-services3-components)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IDiscovery</span></code></a> services</p></li>
-<li><p><cite>*:credential-store:*:*:1.0</cite> (optional) <a class="reference external" href="https://pip-services3-python.github.io/pip-services3-components-python/pip_services3_components.auth.ICredentialStore.html#pip_services3_components.auth.ICredentialStore.ICredentialStore" title="(in pip-services3-components)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ICredentialStore</span></code></a> stores to resolve credentials</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.close">
-<code class="sig-name descname">close</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">correlation_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Closes component and frees used resources.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>correlation_id</strong> – (optional) transaction id to trace execution through call chain.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>raise error or null no errors occured.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.configure">
-<code class="sig-name descname">configure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.configure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configures component by passing configuration parameters.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>config</strong> – configuration parameters to be set.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.get_connection">
-<code class="sig-name descname">get_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.get_connection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.get_database_name">
-<code class="sig-name descname">get_database_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.get_database_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.is_open">
-<code class="sig-name descname">is_open</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.is_open" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks if the component is opened.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>true if the component has been opened and false otherwise.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.open">
-<code class="sig-name descname">open</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">correlation_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.open" title="Permalink to this definition">¶</a></dt>
-<dd><p>Opens the component.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>correlation_id</strong> – (optional) transaction id to trace execution through call chain.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>raise error or None no errors occured.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.set_references">
-<code class="sig-name descname">set_references</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">references</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pip_services3_sqlserver.persistence.SqlServerConnection.SqlServerConnection.set_references" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets references to dependent components.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>references</strong> – references to locate the component dependencies.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="pip-services3-sqlserver-persistence-sqlserverconnection-module">
+<h1>pip_services3_sqlserver.persistence.SqlServerConnection module<a class="headerlink" href="#pip-services3-sqlserver-persistence-sqlserverconnection-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -300,10 +161,6 @@ you can reduce number of used database connections.</p>
            
           </div>
           <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="pip_services3_sqlserver.persistence.SqlServerPersistence.html" class="btn btn-neutral float-right" title="pip_services3_sqlserver.persistence.SqlServerPersistence module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="pip_services3_sqlserver.persistence.IdentifiableSqlServerPersistence.html" class="btn btn-neutral float-left" title="pip_services3_sqlserver.persistence.IdentifiableSqlServerPersistence module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-    </div>
 
   <hr/>
 

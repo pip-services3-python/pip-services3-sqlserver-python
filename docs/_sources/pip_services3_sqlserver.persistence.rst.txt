@@ -9,7 +9,6 @@ Submodules
 
    pip_services3_sqlserver.persistence.IdentifiableJsonSqlServerPersistence
    pip_services3_sqlserver.persistence.IdentifiableSqlServerPersistence
-   pip_services3_sqlserver.persistence.SqlServerConnection
    pip_services3_sqlserver.persistence.SqlServerPersistence
 
 Module contents
