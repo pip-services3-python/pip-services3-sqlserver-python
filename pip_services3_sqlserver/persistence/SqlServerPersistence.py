@@ -172,6 +172,8 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
     def _ensure_index(self, name: str, keys: Any, options: Any = None):
         """
         Adds index definition to create it on opening
+        
+        :param name: the index name
         :param keys:  index keys (fields)
         :param options: index options
         """
