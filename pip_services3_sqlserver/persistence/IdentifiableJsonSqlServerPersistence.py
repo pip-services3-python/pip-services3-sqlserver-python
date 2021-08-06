@@ -26,7 +26,8 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence):
     accessing **self._collection** and **self._model** properties.
 
     ### Configuration parameters ###
-        - collection:                  (optional) SqlServer collection name
+        - table:                       (optional) SQLServer table name
+        - schema:                       (optional) SQLServer table name
         - connection(s):
             - discovery_key:             (optional) a key to retrieve the connection from :class:`IDiscovery <pip_services3_components.connect.IDiscovery.IDiscovery>`
             - host:                      host name or IP address
@@ -80,13 +81,14 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence):
         # ...
     """
 
-    def __init__(self, table_name: str = None):
+    def __init__(self, table_name: str = None, schema_name: str = None):
         """
         Creates a new instance of the persistence component.
 
-        :param table_name: (optional) a collection name.
+        :param table_name: (optional) a table name.
+        :param schema_name: (optional) a schema name.
         """
-        super(IdentifiableJsonSqlServerPersistence, self).__init__(table_name)
+        super(IdentifiableJsonSqlServerPersistence, self).__init__(table_name, schema_name)
 
     def _ensure_table(self, id_type: str = 'VARCHAR(32)', data_type: str = 'NVARCHAR(MAX)'):
         """
@@ -95,9 +97,15 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence):
         :param id_type: type of the id column (default: TEXT)
         :param data_type: type of the data column (default: JSONB)
         """
-        query = "CREATE TABLE " + self._quote_identifier(
-            self._table_name) + " ([id] " + id_type + " PRIMARY KEY, [data] " + data_type + ")"
-        self._auto_create_object(query)
+        if self._schema_name is not None:
+            query = "IF NOT EXISTS (SELECT * FROM [sys].[schemas] WHERE [name]=N'" \
+                    + self._schema_name + "') EXEC('CREATE SCHEMA " \
+                    + self._quote_identifier(self._schema_name) + "')"
+
+            self._ensure_schema(query)
+
+        query = "CREATE TABLE " + self._quoted_table_name() + " ([id] " + id_type + " PRIMARY KEY, [data] " + data_type + ")"
+        self._ensure_schema(query)
 
     def _convert_to_public(self, value: Any) -> Any:
         """
@@ -160,8 +168,7 @@ class IdentifiableJsonSqlServerPersistence(IdentifiableSqlServerPersistence):
 
         values.append(id)
 
-        query = "UPDATE " + self._quote_identifier(
-            self._table_name) + " SET [data]=" + set + " OUTPUT INSERTED.* WHERE [id]=?"
+        query = "UPDATE " + self._quoted_table_name() + " SET [data]=" + set + " OUTPUT INSERTED.* WHERE [id]=?"
 
         result = self._request(query, values)
 

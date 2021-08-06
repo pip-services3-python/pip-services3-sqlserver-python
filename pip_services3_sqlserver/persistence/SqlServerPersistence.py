@@ -27,7 +27,8 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
     accessing **self._db** or **self._collection** properties.
 
     ### Configuration parameters ###
-        - collection:                  (optional) SqlServer collection name
+        - table:                       (optional) SQLServer table name
+        - schema:                       (optional) SQLServer table name
         - connection(s):
             - discovery_key:             (optional) a key to retrieve the connection from :class:`IDiscovery <pip_services3_components.connect.IDiscovery.IDiscovery>`
             - host:                      host name or IP address
@@ -77,7 +78,8 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         print(item) # Result: { name: "ABC" }
     """
     __default_config = ConfigParams = ConfigParams.from_tuples(
-        "collection", None,
+        "table", None,
+        "schema", None,
         "dependencies.connection", "*:connection:sqlserver:*:1.0",
 
         # connections.*
@@ -91,11 +93,12 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         "options.debug", True
     )
 
-    def __init__(self, table_name: str = None):
+    def __init__(self, table_name: str = None, schema_name: str = None):
         """
         Creates a new instance of the persistence component.
 
         :param table_name: (optional) a table name.
+        :param schema_name: (optional) a schema name.
         """
         # The SQLServer table object.
         self._table_name: str = table_name
@@ -110,6 +113,10 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         # The SQLServer connection pool object.
         self._client: Any = None
 
+        # The SQLServer schema object.
+        self._schema_name: str = schema_name
+
+        # The maximum number of objects in data pages
         self._max_page_size = 100
 
         self.__config: ConfigParams = None
@@ -131,6 +138,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
 
         self._table_name = config.get_as_string_with_default('collection', self._table_name)
         self._table_name = config.get_as_string_with_default('table', self._table_name)
+        self._schema_name = config.get_as_string_with_default("schema", self._schema_name)
         self._max_page_size = config.get_as_integer_with_default('options.max_page_size', self._max_page_size)
 
     def set_references(self, references: IReferences):
@@ -183,7 +191,11 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         if options.get('unique'):
             builder += ' UNIQUE'
 
-        builder += " INDEX " + name + " ON " + self._quote_identifier(self._table_name)
+        index_name = self._quote_identifier(name)
+        if self._schema_name is not None:
+            index_name = self._quote_identifier(self._schema_name) + '.' + index_name
+
+        builder += " INDEX " + index_name + " ON " + self._quoted_table_name()
 
         if options.get('type'):
             builder += " " + options['type']
@@ -199,16 +211,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
 
         builder += "(" + fields + ")"
 
-        self._auto_create_object(builder)
-
-    def _auto_create_object(self, schema_statement: str):
-        """
-        Adds a statement to schema definition.
-        This is a deprecated method. Use ensureSchema instead.
-
-        :param schema_statement: a statement to be added to the schema
-        """
-        self._ensure_schema(schema_statement)
+        self._ensure_schema(builder)
 
     def _ensure_schema(self, schema_statement: str):
         """
@@ -265,6 +268,16 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         if value[0] == '[':
             return value
         return '[' + value.replace(".", "].[") + ']'
+
+    def _quoted_table_name(self) -> Optional[str]:
+        if self._table_name is None:
+            return None
+
+        builder = self._quote_identifier(self._table_name)
+        if self._schema_name is not None:
+            builder = self._quote_identifier(self._schema_name) + '.' + builder
+
+        return builder
 
     def is_open(self) -> bool:
         """
@@ -342,7 +355,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         # Return error if collection is not set
         if self._table_name is None:
             raise Exception('Table name is not defined')
-        query = "DELETE FROM " + self._quote_identifier(self._table_name)
+        query = "DELETE FROM " + self._quoted_table_name()
 
         try:
             self._request(query)
@@ -391,6 +404,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
             return
 
         # Check if table exist to determine weither to auto create objects
+        # Todo: Add support for schema
         query = "SELECT OBJECT_ID('" + self._table_name + "', 'U') as oid"
         result = self._request(query)
         if result[0] and len(result[0]) > 0 and result[0].oid:
@@ -482,7 +496,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         :return: a data page or raise error
         """
         select = select if select and len(select) > 0 else '*'
-        query = "SELECT " + select + " FROM " + self._quote_identifier(self._table_name)
+        query = "SELECT " + select + " FROM " + self._quoted_table_name()
 
         # Adjust max item count based on configuration
         paging = paging or PagingParams()
@@ -510,7 +524,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         items = list(map(self._convert_to_public, items))
 
         if paging_enabled:
-            query = 'SELECT COUNT(*) AS count FROM ' + self._quote_identifier(self._table_name)
+            query = 'SELECT COUNT(*) AS count FROM ' + self._quoted_table_name()
             if filter is not None and filter != '':
                 query = " WHERE " + filter
             result = self._request(query)
@@ -530,7 +544,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         :param filter: (optional) a filter JSON object
         :return: a data page or error
         """
-        query = 'SELECT COUNT(*) AS count FROM ' + self._quote_identifier(self._table_name)
+        query = 'SELECT COUNT(*) AS count FROM ' + self._quoted_table_name()
         if filter and filter != '':
             query += " WHERE " + filter
 
@@ -557,7 +571,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         :return: a data list
         """
         select = select if select and len(select) > 0 else '*'
-        query = "SELECT " + select + " FROM " + self._quote_identifier(self._table_name)
+        query = "SELECT " + select + " FROM " + self._quoted_table_name()
 
         if filter and filter != '':
             query += " WHERE " + filter
@@ -585,25 +599,27 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         :param filter: (optional) a filter JSON object
         :return: a random item
         """
-        query = 'SELECT COUNT(*) AS count FROM ' + self._quote_identifier(self._table_name)
+        query = 'SELECT COUNT(*) AS count FROM ' + self._quoted_table_name()
         if filter and filter != '':
             query += " WHERE " + filter
 
         result = self._request(query)
+        count = result['recordset'][0]['count'] if result['recordset'] and len(result['recordset']) == 1 else 0
 
-        query = "SELECT * FROM " + self._quote_identifier(self._table_name)
+        if count == 0:
+            return None
+
+        query = "SELECT * FROM " + self._quoted_table_name()
 
         if filter and filter != '':
             query += " WHERE " + filter
 
-        count = result['recordset'][0]['count'] if result['recordset'] and len(result['recordset']) == 1 else 0
         pos = randint(0, count - 1)
-
         query += f" OFFSET {pos} LIMIT 1"
 
         result = self._request(query)
         items = result['recordset']
-        item = items[0] if items is not None and len(items) > 0 else None
+        item = None if items is None or len(items) < 0 else items[0]
 
         if item is None:
             self._logger.trace(correlation_id, "Random item wasn't found from %s", self._table_name)
@@ -629,8 +645,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         params = self._generate_parameters(row)
         values = self._generate_values(row)
 
-        query = "INSERT INTO " + self._quote_identifier(
-            self._table_name) + " (" + columns + ") OUTPUT INSERTED.* VALUES (" + params + ")"
+        query = "INSERT INTO " + self._quoted_table_name() + " (" + columns + ") OUTPUT INSERTED.* VALUES (" + params + ")"
 
         result = self._request(query, values)
 
@@ -649,7 +664,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         :param filter: (optional) a filter JSON object.
         :return: null for success
         """
-        query = "DELETE FROM " + self._quote_identifier(self._table_name)
+        query = "DELETE FROM " + self._quoted_table_name()
         if filter and filter != '':
             query += " WHERE " + filter
 

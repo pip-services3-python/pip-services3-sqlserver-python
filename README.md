@@ -28,7 +28,7 @@ As an example, lets create persistence for the following data object.
 
 ```python
 class MyObject(IStringIdentifiable):
-    def __init__(self, id=None, key=None, content=None):
+    def __init__(self, id: str = None, key: str = None, content: str = None):
         self.id = id
         self.key = key
         self.content = content
@@ -98,7 +98,7 @@ class MySqlServerPersistence(IdentifiableSqlServerPersistence):
         return super().get_page_by_filter(correlation_id, self.__compose_filter(filter), paging, 'id', None)
 
     def get_one_by_key(self, correlation_id, key):
-        query = "SELECT * FROM " + self._quote_identifier(self._table_name) + " WHERE [key]=?"
+        query = "SELECT * FROM " + self._quoted_table_name() + " WHERE [key]=?"
         params = [key]
 
         result = self._request(query, params)
@@ -153,7 +153,7 @@ class MySqlServerPersistence(IdentifiableJsonSqlServerPersistence):
         return super().get_page_by_filter(correlation_id, self.__compose_filter(filter), paging, 'id', None)
 
     def get_one_by_key(self, correlation_id, key):
-        query = "SELECT * FROM " + self._quote_identifier(self._table_name) + " WHERE JSON_VALUE([data],'$.key')=?"
+        query = "SELECT * FROM " + self._quoted_table_name() + " WHERE JSON_VALUE([data],'$.key')=?"
         params = [key]
 
         result = self._request(query, params)

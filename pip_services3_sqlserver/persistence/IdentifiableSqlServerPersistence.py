@@ -25,7 +25,8 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
     accessing **self._collection** and **self._model** properties.
 
     ### Configuration parameters ###
-        - collection:                  (optional) SqlServer collection name
+        - table:                       (optional) SQLServer table name
+        - schema:                       (optional) SQLServer table name
         - connection(s):
             - discovery_key:             (optional) a key to retrieve the connection from :class:`IDiscovery <pip_services3_components.connect.IDiscovery.IDiscovery>`
             - host:                      host name or IP address
@@ -79,15 +80,17 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
         # ...
     """
 
-    def __init__(self, table_name: str = None):
+    def __init__(self, table_name: str = None, schema_name: str = None):
         """
         Creates a new instance of the persistence component.
 
         :param table_name: (optional) a collection name.
+        :param schema_name: (optional) a schema name.
         """
-        super(IdentifiableSqlServerPersistence, self).__init__(table_name)
-        if table_name is None:
-            Exception("Table name could not be null")
+        super(IdentifiableSqlServerPersistence, self).__init__(table_name, schema_name)
+
+        # Flag to turn on automated string ID generation
+        self._auto_generate_id: bool = True
 
     def _convert_from_public_partial(self, value: Any) -> Any:
         """
@@ -107,7 +110,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
         :return: a data list or raise error
         """
         params = self._generate_parameters(ids)
-        query = "SELECT * FROM " + self._quote_identifier(self._table_name) + " WHERE [id] IN(" + params + ")"
+        query = "SELECT * FROM " + self._quoted_table_name() + " WHERE [id] IN(" + params + ")"
 
         items = self._request(query, ids)
         if items is not None:
@@ -126,7 +129,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
         :return: data item
         """
 
-        query = "SELECT * FROM " + self._quote_identifier(self._table_name) + " WHERE [id]=?"
+        query = "SELECT * FROM " + self._quoted_table_name() + " WHERE [id]=?"
         params = [id]
 
         result = self._request(query, params)
@@ -153,7 +156,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
 
         # Assign unique id
         new_item = item
-        if new_item.id is None:
+        if new_item.id is None and self._auto_generate_id:
             new_item = deepcopy(new_item)
             new_item.id = item.id or IdGenerator.next_long()
 
@@ -172,7 +175,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
             return
 
         # Assign unique id
-        if item.get('id') is None:
+        if item.get('id') is None and self._auto_generate_id:
             item['id'] = item.get('id') or IdGenerator.next_long()
 
         row = self._convert_from_public(item)
@@ -181,8 +184,8 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
         set_params = self._generate_set_parameters(row)
         values = self._generate_values(row)
 
-        query = "INSERT INTO " + self._quote_identifier(
-            self._table_name) + " (" + columns + ") OUTPUT INSERTED.* VALUES (" + params + ")"
+        query = "INSERT INTO " + self._quoted_table_name() \
+                + " (" + columns + ") OUTPUT INSERTED.* VALUES (" + params + ")"
 
         new_item = None
 
@@ -205,8 +208,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
             return new_item
 
         values.append(item['id'])
-        query = "UPDATE " + self._quote_identifier(
-            self._table_name) + " SET " + set_params + f" OUTPUT INSERTED.* WHERE [id]=?"
+        query = "UPDATE " + self._quoted_table_name() + " SET " + set_params + f" OUTPUT INSERTED.* WHERE [id]=?"
 
         result = self._request(query, values)
         self._logger.trace(correlation_id, "Set in %s with id = %s", self._table_name, item['id'])
@@ -230,8 +232,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
         values = self._generate_values(row)
         values.append(item.id)
 
-        query = "UPDATE " + self._quote_identifier(
-            self._table_name) + " SET " + params + f" OUTPUT INSERTED.* WHERE [id]=?"
+        query = "UPDATE " + self._quoted_table_name() + " SET " + params + f" OUTPUT INSERTED.* WHERE [id]=?"
         # params = self._create_params(values)
 
         result = self._request(query, values)
@@ -260,8 +261,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
         values = self._generate_values(row)
         values.append(id)
 
-        query = "UPDATE " + self._quote_identifier(
-            self._table_name) + " SET " + params + f" OUTPUT INSERTED.* WHERE [id]=?"
+        query = "UPDATE " + self._quoted_table_name() + " SET " + params + f" OUTPUT INSERTED.* WHERE [id]=?"
 
         # params = self._create_params(values)
         result = self._request(query, values)
@@ -280,7 +280,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
         :return: deleted item
         """
         values = [id]
-        query = "DELETE FROM " + self._quote_identifier(self._table_name) + " OUTPUT DELETED.* WHERE [id]=?"
+        query = "DELETE FROM " + self._quoted_table_name() + " OUTPUT DELETED.* WHERE [id]=?"
 
         result = self._request(query, values)
         self._logger.trace(correlation_id, "Deleted from %s with id = %s", self._table_name, id)
@@ -298,7 +298,7 @@ class IdentifiableSqlServerPersistence(SqlServerPersistence):
         :return: None for success
         """
         params = self._generate_parameters(ids)
-        query = "DELETE FROM " + self._quote_identifier(self._table_name) + " WHERE \"id\" IN(" + params + ")"
+        query = "DELETE FROM " + self._quoted_table_name() + " WHERE \"id\" IN(" + params + ")"
 
         count = self._request(query, ids)
 
