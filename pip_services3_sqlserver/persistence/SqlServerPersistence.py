@@ -481,7 +481,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         return list(values.values())
 
     def get_page_by_filter(self, correlation_id: Optional[str], filter: Any, paging: PagingParams,
-                           sort: Any, select: Any) -> DataPage:
+                           sort: Any = None, select: Any = None) -> DataPage:
         """
         Gets a page of data items retrieved by a given filter and sorted according to sort parameters.
 
@@ -558,7 +558,7 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
 
         return count
 
-    def get_list_by_filter(self, correlation_id: Optional[str], filter: Any, sort: Any, select: Any) -> List[T]:
+    def get_list_by_filter(self, correlation_id: Optional[str], filter: Any, sort: Any = None, select: Any = None) -> List[T]:
         """
         Gets a list of data items retrieved by a given filter and sorted according to sort parameters.
         This method shall be called by a public getListByFilter method from child class that

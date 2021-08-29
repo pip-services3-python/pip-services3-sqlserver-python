@@ -9,7 +9,6 @@ from pip_services3_commons.errors import ConnectionException
 from pip_services3_commons.refer import IReferenceable, IReferences
 from pip_services3_commons.run import IOpenable
 from pip_services3_components.log import CompositeLogger
-
 from pip_services3_sqlserver.connect.SqlServerConnectionResolver import SqlServerConnectionResolver
 
 
@@ -96,10 +95,6 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
         return self._connection is not None
 
     def __compose_uri_settings(self, uri: str) -> str:
-        max_pool_size = self._options.get_as_nullable_string("max_pool_size")
-        connect_timeout_MS = self._options.get_as_nullable_integer("connect_timeout")
-        request_timeout_MS = self._options.get_as_nullable_integer("request_timeout")
-        idle_timeout_MS = self._options.get_as_nullable_integer("idle_timeout")
 
         settings = {
             # 'parseJSON': true,
@@ -142,12 +137,21 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
             try:
                 # config = self.__compose_uri_settings(uri)
 
+                max_pool_size = self._options.get_as_nullable_string("max_pool_size")
+                connect_timeout_MS = self._options.get_as_nullable_integer("connect_timeout") or 0
+                request_timeout_MS = self._options.get_as_nullable_integer("request_timeout") or 0
+                # idle_timeout_MS = self._options.get_as_nullable_integer("idle_timeout") or 0
+
                 parsed_url = urlparse.urlparse(uri)
                 connect_str = 'DRIVER={ODBC Driver 17 for SQL Server};' + \
                               f'Server={parsed_url.hostname},{parsed_url.port};\
                               Database={parsed_url.path[1:]}; UID={parsed_url.username}; PWD={parsed_url.password};'
                 # Try to connect
-                self._connection = pyodbc.connect(connect_str)
+                if max_pool_size:
+                    pyodbc.SQL_MAX_DRIVER_CONNECTIONS = max_pool_size
+
+                self._connection = pyodbc.connect(connect_str, timeout=int(connect_timeout_MS / 1000))
+                self._connection.timeout = int(request_timeout_MS / 1000)
                 cursor = self._connection.cursor()
                 cursor.execute('SET ARITHABORT ON')
                 cursor.commit()
