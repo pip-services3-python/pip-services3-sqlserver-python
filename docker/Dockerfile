@@ -1,7 +1,14 @@
-FROM python:3.8-slim-buster
+FROM python:3.9-slim-buster
 
 # set working directory
 WORKDIR /usr/src/app
+
+# install system dependencies
+RUN apt-get update \
+    && apt-get -y install gcc \
+    && apt-get -y install g++ \
+    && apt-get -y install unixodbc unixodbc-dev \
+    && apt-get clean
 
 # copy project file
 COPY requirements.txt .
@@ -11,3 +18,6 @@ RUN pip install -r requirements.txt
 
 # copy all project
 COPY . .
+
+# create package
+RUN python setup.py sdist
