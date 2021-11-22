@@ -9,8 +9,6 @@ from pip_services3_sqlserver.connect.SqlServerConnection import SqlServerConnect
 class TestSqlServerConnection:
     connection: SqlServerConnection
 
-
-
     def setup_method(self):
         sqlserver_uri = os.getenv('SQLSERVER_URI')
         sqlserver_host = os.getenv('SQLSERVER_HOST') or 'localhost'
@@ -41,5 +39,3 @@ class TestSqlServerConnection:
     def test_open_and_close(self):
         assert self.connection.get_connection() is not None
         assert isinstance(self.connection.get_database_name(), str)
-
-

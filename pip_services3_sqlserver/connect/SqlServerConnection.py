@@ -9,6 +9,7 @@ from pip_services3_commons.errors import ConnectionException
 from pip_services3_commons.refer import IReferenceable, IReferences
 from pip_services3_commons.run import IOpenable
 from pip_services3_components.log import CompositeLogger
+
 from pip_services3_sqlserver.connect.SqlServerConnectionResolver import SqlServerConnectionResolver
 
 

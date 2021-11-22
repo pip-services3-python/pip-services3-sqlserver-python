@@ -23,7 +23,7 @@ from setuptools import setup
 
 setup(
     name='pip_services3_sqlserver',
-    version='3.2.1',
+    version='3.2.2',
     url='http://github.com/pip-services3-python/pip-services3-sqlserver-python',
     license='MIT',
     author='Conceptual Vision Consulting LLC',
@@ -36,12 +36,10 @@ setup(
     zip_safe=True,
     platforms='any',
     install_requires=[
-        'iso8601',
-        'PyYAML',
         'pyodbc',
-        'pip_services3_commons',
-        'pip_services3_components',
-        'pip_services3_data'
+        'pip_services3_commons >= 3.3.10, <=4.0',
+        'pip_services3_components >= 3.5.4, <=4.0',
+        'pip_services3_data >= 3.2.3, <=4.0'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -49,8 +47,10 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ]
 )
