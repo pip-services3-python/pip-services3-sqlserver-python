@@ -579,8 +579,8 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         if sort and len(sort) > 0:
             query += " ORDER BY " + sort
 
-        result = self._request(query)
-        items = result['recordset']
+        items = self._request(query)
+        # items = result[0]
 
         if items is not None:
             self._logger.trace(correlation_id, "Retrieved %d from %s", len(items), self._table_name)
@@ -604,7 +604,11 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
             query += " WHERE " + filter
 
         result = self._request(query)
-        count = result['recordset'][0]['count'] if result['recordset'] and len(result['recordset']) == 1 else 0
+
+        if len(result) > 0 and len(result[0]) == 1:
+            count = result[0][0]
+        else:
+            count = 0
 
         if count == 0:
             return None
@@ -614,11 +618,12 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
         if filter and filter != '':
             query += " WHERE " + filter
 
-        pos = randint(0, count - 1)
-        query += f" OFFSET {pos} LIMIT 1"
+        count = 0 if count == 0 else count - 1
+        pos = randint(0, count)
 
-        result = self._request(query)
-        items = result['recordset']
+        query += f" ORDER BY (SELECT NULL) OFFSET {pos} ROWS FETCH NEXT 1 ROWS ONLY"
+
+        items = self._request(query)
         item = None if items is None or len(items) < 0 else items[0]
 
         if item is None:
@@ -670,6 +675,6 @@ class SqlServerPersistence(IReferenceable, IUnreferenceable, IConfigurable, IOpe
 
         result = self._request(query)
 
-        count = result['rowsAffected'][0] if result and result['rowsAffected'] else 0
+        count = result if result else 0
 
         self._logger.trace(correlation_id, "Deleted %d items from %s", count, self._table_name)

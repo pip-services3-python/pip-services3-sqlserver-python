@@ -146,7 +146,9 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
                 parsed_url = urlparse.urlparse(uri)
                 connect_str = 'DRIVER={ODBC Driver 17 for SQL Server};' + \
                               f'Server={parsed_url.hostname},{parsed_url.port};\
-                              Database={parsed_url.path[1:]}; UID={parsed_url.username}; PWD={parsed_url.password};'
+                              Database={parsed_url.path[1:]};' + \
+                              f'UID={parsed_url.username};\
+                                 PWD={parsed_url.password};' if parsed_url.username and parsed_url.password else 'Trusted_Connection=yes;'
                 # Try to connect
                 if max_pool_size:
                     pyodbc.SQL_MAX_DRIVER_CONNECTIONS = max_pool_size
