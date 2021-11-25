@@ -23,7 +23,7 @@ from setuptools import setup
 
 setup(
     name='pip_services3_sqlserver',
-    version='3.2.3',
+    version='3.2.4',
     url='http://github.com/pip-services3-python/pip-services3-sqlserver-python',
     license='MIT',
     author='Conceptual Vision Consulting LLC',

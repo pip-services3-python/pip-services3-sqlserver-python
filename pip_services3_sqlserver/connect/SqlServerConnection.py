@@ -144,11 +144,20 @@ class SqlServerConnection(IReferenceable, IConfigurable, IOpenable):
                 # idle_timeout_MS = self._options.get_as_nullable_integer("idle_timeout") or 0
 
                 parsed_url = urlparse.urlparse(uri)
-                connect_str = 'DRIVER={ODBC Driver 17 for SQL Server};' + \
-                              f'Server={parsed_url.hostname},{parsed_url.port};\
-                              Database={parsed_url.path[1:]};' + \
-                              f'UID={parsed_url.username};\
-                                 PWD={parsed_url.password};' if parsed_url.username and parsed_url.password else 'Trusted_Connection=yes;'
+
+                # compose connection string
+                connect_str = 'DRIVER={SQL Server};' + f'Server={parsed_url.hostname}'
+
+                if parsed_url.port > 0:
+                    connect_str += f', {parsed_url.port}'
+
+                connect_str += f';Database={parsed_url.path[1:]};'
+
+                if parsed_url.username and parsed_url.password:
+                    connect_str += f'UID={parsed_url.username};PWD={parsed_url.password};'
+                else:
+                    connect_str += 'Trusted_Connection=yes;'
+
                 # Try to connect
                 if max_pool_size:
                     pyodbc.SQL_MAX_DRIVER_CONNECTIONS = max_pool_size
