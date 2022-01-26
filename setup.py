@@ -36,10 +36,10 @@ setup(
     zip_safe=True,
     platforms='any',
     install_requires=[
-        'pyodbc',
-        'pip_services3_commons >= 3.3.10, <=4.0',
-        'pip_services3_components >= 3.5.4, <=4.0',
-        'pip_services3_data >= 3.2.3, <=4.0'
+        'pyodbc >= 4.0.32, < 5.0.0',
+        'pip_services3_commons >= 3.3.11, < 4.0',
+        'pip_services3_components >= 3.5.5, < 4.0',
+        'pip_services3_data >= 3.2.3, < 4.0'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -47,7 +47,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
