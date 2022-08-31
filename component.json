@@ -1,5 +1,5 @@
 {
-    "name":  "pip_services3_sqlserver",
+    "name":  "pip-services3-sqlserver",
     "type": "module",
     "language": "python",
     "version": "3.2.4",
